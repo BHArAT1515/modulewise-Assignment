@@ -1,0 +1,10 @@
+def extract_chars(s):
+    if len(s) < 2:
+        return ""
+
+    return s[:2] + s[-2:]
+
+# Example usage
+input_str = input("Enter a string: ")
+result = extract_chars(input_str)
+print("Result:", result)

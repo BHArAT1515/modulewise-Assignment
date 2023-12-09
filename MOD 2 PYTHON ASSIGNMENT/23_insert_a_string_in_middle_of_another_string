@@ -1,0 +1,11 @@
+def insert_in_middle(main_str, insert_str):
+    middle_index = len(main_str) // 2
+    result = main_str[:middle_index] + insert_str + main_str[middle_index:]
+
+    return result
+
+# Example usage
+main_string = input("Enter the main string: ")
+insert_string = input("Enter the string to insert: ")
+result = insert_in_middle(main_string, insert_string)
+print("Result:", result)

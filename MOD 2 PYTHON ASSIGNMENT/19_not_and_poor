@@ -1,0 +1,13 @@
+def replace_not_poor(s):
+    not_index = s.find('not')
+    poor_index = s.find('poor')
+
+    if not_index != -1 and poor_index != -1 and not_index < poor_index:
+        s = s[:not_index] + 'good' + s[poor_index + 4:]
+
+    return s
+
+# Example usage
+input_str = input("Enter a string: ")
+result = replace_not_poor(input_str)
+print("Result:", result)

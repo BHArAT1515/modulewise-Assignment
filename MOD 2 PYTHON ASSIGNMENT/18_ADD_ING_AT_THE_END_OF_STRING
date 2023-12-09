@@ -1,0 +1,15 @@
+def add_suffix(s):
+    # Check if the length of the string is at least 3
+    if len(s) >= 3:
+        # Check if the string ends with 'ing'
+        if s[-3:] == 'ing':
+            s = s[:-3] + 'ly'
+        else:
+            s += 'ing'
+    
+    return s
+
+# Example usage
+input_str = input("Enter a string: ")
+result = add_suffix(input_str)
+print("Result:", result)

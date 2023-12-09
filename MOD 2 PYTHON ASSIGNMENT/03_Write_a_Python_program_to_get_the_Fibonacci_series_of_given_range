@@ -1,0 +1,20 @@
+# Function to generate Fibonacci series up to a given range
+def fibonacci_series(n):
+    fib_series = [0, 1]
+
+    while fib_series[-1] + fib_series[-2] <= n:
+        next_term = fib_series[-1] + fib_series[-2]
+        fib_series.append(next_term)
+
+    return fib_series
+
+# Get user input for the range with error handling
+try:
+    range_limit = int(input("Enter the range for Fibonacci series: "))
+except ValueError:
+    print("Invalid input. Please enter a valid integer.")
+    exit()
+
+    
+result = fibonacci_series(range_limit)
+print(f"Fibonacci series up to {range_limit}: {result}")

@@ -1,0 +1,10 @@
+def reverse_if_multiple_of_4(s):
+    if len(s) % 4 == 0:
+        s = s[::-1]
+
+    return s
+
+# Example usage
+input_str = input("Enter a string: ")
+result = reverse_if_multiple_of_4(input_str)
+print("Result:", result)
