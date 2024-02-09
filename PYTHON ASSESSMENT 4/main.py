@@ -1,120 +1,140 @@
-import json
-import os
+import tkinter as tk
+from tkinter import messagebox
+from Database_Connection import DatabaseConnection
+from business_logic import BusinessLogic
 
-def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
+# Initialize database connection
+db = DatabaseConnection(host="localhost", username="yourusername", password="yourpassword", database="product_management")
+db.connect()
 
-def display_menu():
-    print("\nMenu:")
-    print("1. Quiz Master Operations")
-    print("2. Quiz Cracker")
-    print("3. Exit")
+# Initialize business logic
+logic = BusinessLogic(db)
 
-def quiz_master_menu(questions):
-    while True:
-        print("\nQuiz Master Menu:")
-        print("1. Add Question")
-        print("2. View Questions")
-        print("3. Delete Question")
-        print("4. Exit")
+def register_form():
+    register_window = tk.Toplevel(root)
+    register_window.title("Register")
+    tk.Label(register_window, text="Username:").grid(row=0, column=0)
+    tk.Label(register_window, text="Password:").grid(row=1, column=0)
+    username_entry = tk.Entry(register_window)
+    password_entry = tk.Entry(register_window, show="*")
+    username_entry.grid(row=0, column=1)
+    password_entry.grid(row=1, column=1)
 
-        choice = input("Enter your choice: ")
+    def register():
+        username = username_entry.get()
+        password = password_entry.get()
+        try:
+            logic.register_user(username, password)
+            messagebox.showinfo("Success", "Registration successful")
+            register_window.destroy()
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
-        if choice == '1':
-            add_question(questions)
-        elif choice == '2':
-            view_questions(questions)
-        elif choice == '3':
-            delete_question(questions)
-        elif choice == '4':
-            print("Exiting Quiz Master Menu.")
-            break
-        else:
-            print("Invalid choice. Please enter a valid option.")
+    tk.Button(register_window, text="Register", command=register).grid(row=2, column=1)
 
-def quiz_cracker_menu(questions):
-    while True:
-        print("\nQuiz Cracker Menu:")
-        print("1. Display Questions")
-        print("2. Check Answer")
-        print("3. Exit")
+def login_form():
+    login_window = tk.Toplevel(root)
+    login_window.title("Login")
+    tk.Label(login_window, text="Username:").grid(row=0, column=0)
+    tk.Label(login_window, text="Password:").grid(row=1, column=0)
+    username_entry = tk.Entry(login_window)
+    password_entry = tk.Entry(login_window, show="*")
+    username_entry.grid(row=0, column=1)
+    password_entry.grid(row=1, column=1)
 
-        choice = input("Enter your choice: ")
+    def login():
+        username = username_entry.get()
+        password = password_entry.get()
+        try:
+            user_id = logic.login_user(username, password)
+            if user_id:
+                user_type = logic.get_user_type(user_id)
+                if user_type == "Product Manager":
+                    product_manager(user_id)
+                else:
+                    customer(user_id)
+                login_window.destroy()
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
-        if choice == '1':
-            display_questions(questions)
-        elif choice == '2':
-            check_answer(questions)
-        elif choice == '3':
-            print("Exiting Quiz Cracker Menu.")
-            break
-        else:
-            print("Invalid choice. Please enter a valid option.")
+    tk.Button(login_window, text="Login", command=login).grid(row=2, columnspan=2)
 
-def add_question(questions):
-    question_id = input("Enter Question ID: ")
-    question_text = input("Enter Question: ")
-    options = input("Enter Options (comma-separated): ").split(',')
+def product_manager(user_id):
+    product_manager_window = tk.Toplevel(root)
+    product_manager_window.title("Product Manager")
+    tk.Button(product_manager_window, text="Register Product", command=register_product_form).pack()
+    tk.Button(product_manager_window, text="View Products", command=view_products).pack()
 
-    # Add the question to the dictionary
-    questions[question_id] = {'question': question_text, 'options': options}
+def register_product_form():
+    register_product_window = tk.Toplevel(root)
+    register_product_window.title("Register Product")
+    tk.Label(register_product_window, text="Name:").grid(row=0, column=0)
+    tk.Label(register_product_window, text="Quantity:").grid(row=1, column=0)
+    name_entry = tk.Entry(register_product_window)
+    quantity_entry = tk.Entry(register_product_window)
+    name_entry.grid(row=0, column=1)
+    quantity_entry.grid(row=1, column=1)
 
-    print("Question added successfully!")
+    def register():
+        name = name_entry.get()
+        quantity = quantity_entry.get()
+        try:
+            logic.register_product(name, quantity)
+            messagebox.showinfo("Success", "Product registration successful")
+            register_product_window.destroy()
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
-def view_questions(questions):
-    print("\nAll Questions:")
-    for question_id, question_info in questions.items():
-        print(f"ID: {question_id}, Question: {question_info['question']}, Options: {', '.join(question_info['options'])}")
+    tk.Button(register_product_window, text="Register", command=register).grid(row=2, columnspan=2)
 
-def delete_question(questions):
-    view_questions(questions)
+def view_products():
+    try:
+        products = logic.view_products()
+        product_list = "\n".join(str(product) for product in products)
+        messagebox.showinfo("Products", product_list)
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
 
-    question_id = input("Enter Question ID to delete: ")
+def customer(user_id):
+    customer_window = tk.Toplevel(root)
+    customer_window.title("Customer")
+    tk.Button(customer_window, text="Purchase Product", command=purchase_product_form).pack()
+    tk.Button(customer_window, text="View Orders", command=lambda: view_orders(user_id)).pack()
 
-    if question_id in questions:
-        del questions[question_id]
-        print(f"Question with ID {question_id} deleted successfully!")
-    else:
-        print(f"Question with ID {question_id} not found.")
+def purchase_product_form():
+    purchase_product_window = tk.Toplevel(root)
+    purchase_product_window.title("Purchase Product")
+    tk.Label(purchase_product_window, text="Product ID:").grid(row=0, column=0)
+    tk.Label(purchase_product_window, text="Quantity:").grid(row=1, column=0)
+    product_id_entry = tk.Entry(purchase_product_window)
+    quantity_entry = tk.Entry(purchase_product_window)
+    product_id_entry.grid(row=0, column=1)
+    quantity_entry.grid(row=1, column=1)
 
-def display_questions(questions):
-    view_questions(questions)
+    def purchase():
+        product_id = product_id_entry.get()
+        quantity = quantity_entry.get()
+        try:
+            logic.purchase_product(user_id, product_id, quantity)
+            messagebox.showinfo("Success", "Purchase successful")
+            purchase_product_window.destroy()
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
-def check_answer(questions):
-    question_id = input("Enter Question ID to answer: ")
+    tk.Button(purchase_product_window, text="Purchase", command=purchase).grid(row=2, columnspan=2)
 
-    if question_id in questions:
-        correct_answer = input(f"Options: {', '.join(questions[question_id]['options'])}\nEnter correct answer: ")
-        if correct_answer.lower() == 'exit':
-            return
-        elif correct_answer in questions[question_id]['options']:
-            print("Correct answer!")
-        else:
-            print("Incorrect answer.")
-    else:
-        print(f"Question with ID {question_id} not found.")
+def view_orders(user_id):
+    try:
+        orders = logic.view_orders(user_id)
+        order_list = "\n".join(str(order) for order in orders)
+        messagebox.showinfo("Orders", order_list)
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
 
-def save_to_log(data):
-    with open('log.txt', 'a') as log_file:
-        log_file.write(data + '\n')
+root = tk.Tk()
+root.title("Product Management Application")
 
-def main():
-    questions = {}
+tk.Button(root, text="Register", command=register_form).pack()
+tk.Button(root, text="Login", command=login_form).pack()
 
-    while True:
-        clear_screen()
-        display_menu()
-        choice = input("Enter your choice: ")
-
-        if choice == '1':
-            quiz_master_menu(questions)
-        elif choice == '2':
-            quiz_cracker_menu(questions)
-        elif choice == '3':
-            print("Exiting the Quiz Game. Goodbye!")
-            break
-        else:
-            print("Invalid choice. Please enter a valid option.")
-
-if __name__ == "__main__":
-    main()
+root.mainloop()
