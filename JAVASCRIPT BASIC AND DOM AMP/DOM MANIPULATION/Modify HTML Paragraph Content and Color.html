@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modify Paragraph</title>
+    <style>
+        #myParagraph {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <p id="myParagraph">Hello, World!</p>
+
+    <script>
+        // Select the paragraph element
+        let paragraph = document.getElementById("myParagraph");
+
+        // Change the text inside the paragraph
+        paragraph.innerHTML = "JavaScript is fun!";
+
+        // Change the color of the paragraph to blue
+        paragraph.style.color = "blue";
+    </script>
+
+</body>
+</html>
